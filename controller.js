@@ -43,3 +43,18 @@ exports.tambahData = function (req, res) {
     });
        
 };
+
+exports.editData = function (req, res) {
+    var id = req.body.id;
+    var nama = req.body.nama;
+    var jurusan = req.body.jurusan;
+    var hobi = req.body.hobi;
+    connection.query('UPDATE siswa SET nama=?,jurusan=?,hobi=? WHERE id =?', [nama,jurusan,hobi,id],
+    function (error , rows, fileds) {
+        if (error) {
+            connection.log(error);
+        } else {
+            response.ok('Berhasil Ubah Data', res)
+        }
+    });
+}
