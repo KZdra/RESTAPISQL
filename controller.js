@@ -28,3 +28,18 @@ exports.tampilId = function(req,res){
         }
     });
 };
+
+exports.tambahData = function (req, res) {
+    var nama = req.body.nama;
+    var jurusan = req.body.jurusan;
+    var hobi = req.body.hobi;
+    connection.query('INSERT INTO SISWA (nama,jurusan,hobi) VALUES(?,?,?)', [nama,jurusan,hobi],
+    function (error , rows, fileds) {
+        if (error) {
+            connection.log(error);
+        } else {
+            response.ok('Berhasil Tambah Data', res)
+        }
+    });
+       
+};
