@@ -10,6 +10,6 @@ app.use(bodyParser.urlencoded({extended: true}));
 var routes = require('./routes');
 routes(app);
 
-app.listen(6969, () => {
-    console.log(`Server started on port 6969`);
+app.listen(3000, () => {
+    console.log(`Server started on port 3000`);
 });
