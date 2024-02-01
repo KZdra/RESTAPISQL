@@ -58,3 +58,15 @@ exports.editData = function (req, res) {
         }
     });
 }
+
+exports.deleteData = function (req, res){
+    var id = req.body.id;
+    connection.query('DELETE FROM siswa WHERE id =?', [id],
+    function (error , rows, fileds) {
+        if (error) {
+            connection.log(error);
+        } else {
+            response.ok('Berhasil Dihapuss', res)
+        }
+    });
+}

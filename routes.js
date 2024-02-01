@@ -13,6 +13,8 @@ module.exports = function (app) {
     .post(jsonku.tambahData);
     app.route('/edit')
     .put(jsonku.editData);
+    app.route('/delete')
+    .delete(jsonku.deleteData)
 }
 
 
