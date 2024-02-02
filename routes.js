@@ -16,5 +16,3 @@ module.exports = function (app) {
     app.route('/delete')
     .delete(jsonku.deleteData)
 }
-
-
