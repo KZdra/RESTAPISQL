@@ -81,7 +81,7 @@ exports.editData = function (req, res) {
 
 
 exports.deleteData = function (req, res) {
-    var id = req.body.id;
+    var id = req.params.id; // changes to params.id soalnya body.id cuma buat di form postman
     connection.query('DELETE FROM siswa WHERE id =?', [id],
         function (error, rows, fileds) {
             if (error) {
