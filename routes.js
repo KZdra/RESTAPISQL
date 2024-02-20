@@ -11,7 +11,7 @@ module.exports = function (app) {
     .get(jsonku.tampilId);
     app.route('/tambah')
     .post(jsonku.tambahData);
-    app.route('/edit')
+    app.route('/edit/:id')
     .put(jsonku.editData);
     app.route('/delete')
     .delete(jsonku.deleteData)
