@@ -30,30 +30,47 @@ exports.tampilId = function (req, res) {
 };
 
 exports.tambahData = function (req, res) {
+    var nis = req.body.nis;
     var nama = req.body.nama;
-    var jurusan = req.body.jurusan;
-    var hobi = req.body.hobi;
-    connection.query('INSERT INTO SISWA (nama,jurusan,hobi) VALUES(?,?,?)', [nama, jurusan, hobi],
-        function (error, rows, fileds) {
+    var jenis_kelamin = req.body.jenis_kelamin;
+    var tempat_lahir = req.body.tempat_lahir;
+    var tanggal_lahir = req.body.tanggal_lahir;
+    var no_hp = req.body.no_hp;
+    var alamat = req.body.alamat;
+    var nama_ortu = req.body.nama_ortu;
+    
+    connection.query('INSERT INTO SISWA (nis, nama, jenis_kelamin, tempat_lahir, tanggal_lahir, no_hp, alamat, nama_ortu) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', [nis, nama, jenis_kelamin, tempat_lahir, tanggal_lahir, no_hp, alamat, nama_ortu],
+        function (error, rows, fields) {
             if (error) {
-                connection.log(error);
+                console.error(error); // Menggunakan console.error untuk menangani kesalahan
+                return res.status(500).json({
+                    status: false,
+                    message: 'Internal Server Error',
+                });
             } else {
-                response.ok('Berhasil Tambah Data', res)
+                return res.status(200).json({
+                    status: true,
+                    message: 'Berhasil Tambah Data',
+                });
             }
         });
-
 };
 
 exports.editData = function (req, res) {
     let id = req.params.id; // Mengambil id dari parameter URL
-    let formData = {
+    let updatedData = {
+        nis: req.body.nis,
         nama: req.body.nama,
-        jurusan: req.body.jurusan,
-        hobi: req.body.hobi
+        jenis_kelamin: req.body.jenis_kelamin,
+        tempat_lahir: req.body.tempat_lahir,
+        tanggal_lahir: req.body.tanggal_lahir,
+        no_hp: req.body.no_hp,
+        alamat: req.body.alamat,
+        nama_ortu: req.body.nama_ortu
     };
 
     // Gunakan parameterized query untuk mencegah SQL injection
-    connection.query('UPDATE siswa SET ? WHERE id = ?', [formData, id], function (err, result) {
+    connection.query('UPDATE SISWA SET ? WHERE id = ?', [updatedData, id], function (err, result) {
         if (err) {
             console.error("Error updating data:", err);
             return res.status(500).json({
