@@ -29,66 +29,106 @@ exports.tampilId = function (req, res) {
     });
 };
 
+const multer = require('multer');
+const path = require('path');
+
+// Set storage engine
+const storage = multer.diskStorage({
+    destination: './uploads/', // Folder untuk menyimpan gambar
+    filename: function(req, file, cb){
+        cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
+    }
+});
+
+// Init upload
+const upload = multer({
+    storage: storage,
+    limits:{fileSize: 1000000}, // 1 MB maksimal
+}).single('gambar'); // 'gambar' adalah nama field pada form yang digunakan untuk mengirimkan gambar
+
 exports.tambahData = function (req, res) {
-    var nis = req.body.nis;
-    var nama = req.body.nama;
-    var jenis_kelamin = req.body.jenis_kelamin;
-    var tempat_lahir = req.body.tempat_lahir;
-    var tanggal_lahir = req.body.tanggal_lahir;
-    var no_hp = req.body.no_hp;
-    var alamat = req.body.alamat;
-    var nama_ortu = req.body.nama_ortu;
-    
-    connection.query('INSERT INTO SISWA (nis, nama, jenis_kelamin, tempat_lahir, tanggal_lahir, no_hp, alamat, nama_ortu) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', [nis, nama, jenis_kelamin, tempat_lahir, tanggal_lahir, no_hp, alamat, nama_ortu],
-        function (error, rows, fields) {
-            if (error) {
-                console.error(error); // Menggunakan console.error untuk menangani kesalahan
-                return res.status(500).json({
-                    status: false,
-                    message: 'Internal Server Error',
-                });
-            } else {
-                return res.status(200).json({
-                    status: true,
-                    message: 'Berhasil Tambah Data',
-                });
-            }
-        });
-};
-
-exports.editData = function (req, res) {
-    let id = req.params.id; // Mengambil id dari parameter URL
-    let updatedData = {
-        nis: req.body.nis,
-        nama: req.body.nama,
-        jenis_kelamin: req.body.jenis_kelamin,
-        tempat_lahir: req.body.tempat_lahir,
-        tanggal_lahir: req.body.tanggal_lahir,
-        no_hp: req.body.no_hp,
-        alamat: req.body.alamat,
-        nama_ortu: req.body.nama_ortu
-    };
-
-    // Gunakan parameterized query untuk mencegah SQL injection
-    connection.query('UPDATE SISWA SET ? WHERE id = ?', [updatedData, id], function (err, result) {
-        if (err) {
-            console.error("Error updating data:", err);
+    upload(req, res, function(err) {
+        if(err) {
+            console.error(err);
             return res.status(500).json({
                 status: false,
                 message: 'Internal Server Error',
             });
         } else {
-            console.log("Rows affected:", result.affectedRows);
-            if (result.affectedRows === 0) {
-                // Tidak ada baris yang terpengaruh, artinya sumber daya dengan ID yang diberikan tidak ditemukan
-                return res.status(404).json({
-                    status: false,
-                    message: 'Resource not found',
+            const nis = req.body.nis;
+            const nama = req.body.nama;
+            const jenis_kelamin = req.body.jenis_kelamin;
+            const tempat_lahir = req.body.tempat_lahir;
+            const tanggal_lahir = req.body.tanggal_lahir;
+            const no_hp = req.body.no_hp;
+            const alamat = req.body.alamat;
+            const nama_ortu = req.body.nama_ortu;
+            const gambar = req.file ? req.file.filename : null; // Mengambil nama file gambar jika ada
+
+            connection.query('INSERT INTO SISWA (nis, nama, jenis_kelamin, tempat_lahir, tanggal_lahir, no_hp, alamat, nama_ortu, gambar) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', [nis, nama, jenis_kelamin, tempat_lahir, tanggal_lahir, no_hp, alamat, nama_ortu, gambar],
+                function (error, rows, fields) {
+                    if (error) {
+                        console.error(error); // Menggunakan console.error untuk menangani kesalahan
+                        return res.status(500).json({
+                            status: false,
+                            message: 'Internal Server Error',
+                        });
+                    } else {
+                        return res.status(200).json({
+                            status: true,
+                            message: 'Berhasil Tambah Data',
+                        });
+                    }
                 });
-            }
-            return res.status(200).json({
-                status: true,
-                message: 'Update Data Successfully!',
+        }
+    });
+};
+
+exports.editData = function (req, res) {
+    const id = req.params.id; // Mengambil id dari parameter URL
+
+    upload(req, res, function(err) {
+        if(err) {
+            console.error(err);
+            return res.status(500).json({
+                status: false,
+                message: 'Internal Server Error',
+            });
+        } else {
+            const updatedData = {
+                nis: req.body.nis,
+                nama: req.body.nama,
+                jenis_kelamin: req.body.jenis_kelamin,
+                tempat_lahir: req.body.tempat_lahir,
+                tanggal_lahir: req.body.tanggal_lahir,
+                no_hp: req.body.no_hp,
+                alamat: req.body.alamat,
+                nama_ortu: req.body.nama_ortu,
+                gambar: req.file ? req.file.filename : null // Mengambil nama file gambar jika ada
+            };
+
+            // Gunakan parameterized query untuk mencegah SQL injection
+            connection.query('UPDATE SISWA SET ? WHERE id = ?', [updatedData, id], function (err, result) {
+                if (err) {
+                    console.error("Error updating data:", err);
+                    return res.status(500).json({
+                        status: false,
+                        message: 'Internal Server Error',
+                    });
+                } else {
+                    console.log("Rows affected:", result.affectedRows);
+                    if (result.affectedRows === 0) {
+                        // Tidak ada baris yang terpengaruh, artinya sumber daya dengan ID yang diberikan tidak ditemukan
+                        return res.status(404).json({
+                            status: false,
+                            message: 'Resource not found',
+                        });
+                    }
+                    return res.status(200).json({
+                        status: true,
+                        message: 'Update Data Successfully!',
+                    });
+                }
             });
         }
     });
